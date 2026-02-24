@@ -140,7 +140,9 @@ const App = () => {
             project.supervisorName?.toLowerCase().includes(term) ||
             project.studentsName?.some((student) =>
               student.toLowerCase().includes(term)
-            )
+            ) ||
+            project.department.toLowerCase().includes(term) ||
+            project.collegeName.toLowerCase().includes(term)
         );
       }
 
