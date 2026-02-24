@@ -297,8 +297,9 @@ const App = () => {
                   key={project.id}
                   ref={(el) => (projectCardsRef.current[index] = el)}
                   className="group bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 border border-gray-100 cursor-pointer transform hover:-translate-y-1"
-                  onClick={() =>
-                    console.log("Viewing project:", project.researchTitle)
+                  onClick={
+                    () => {}
+                    // console.log("Viewing project:", project.researchTitle)
                   }
                 >
                   <div className="p-6">

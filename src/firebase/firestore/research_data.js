@@ -11,7 +11,7 @@ export const getResearchData = async () => {
     const q = query(menuRef, where("isApproved", "==", true));
 
     const querySnapshot = await getDocs(q);
-    console.log("Query snapshot size:", querySnapshot.size);
+    // console.log("Query snapshot size:", querySnapshot.size);
 
     const items = querySnapshot.docs.map((doc) => ({
       id: doc.id,
@@ -25,10 +25,10 @@ export const getResearchData = async () => {
       return dateB - dateA; // newest first
     });
 
-    console.log("Fetched and sorted items:", sortedItems);
+    // console.log("Fetched and sorted items:", sortedItems);
     return sortedItems;
   } catch (error) {
-    console.error("Error in getMenuItemsByCategory:", error);
+    // console.error("Error in getMenuItemsByCategory:", error);
 
     // More specific error messages
     if (error.code === "failed-precondition") {
