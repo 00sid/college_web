@@ -9,6 +9,10 @@ import {
   Award,
   TrendingUp,
   Loader2,
+  Filter,
+  ChevronDown,
+  Building,
+  GraduationCap,
 } from "lucide-react";
 import { getResearchData } from "./firebase/firestore/research_data";
 
@@ -17,7 +21,12 @@ const App = () => {
   const [projects, setProjects] = useState([]);
   const [filteredProjects, setFilteredProjects] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [isLoading, setIsLoading] = useState(false); // for search debounce
+  const [filters, setFilters] = useState({
+    college: "All",
+    department: "All",
+  });
+  const [showFilters, setShowFilters] = useState(false);
+  const [isLoading, setIsLoading] = useState(false); // for filter debounce
   const [initialLoading, setInitialLoading] = useState(true); // for initial fetch
   const [error, setError] = useState(null);
 
@@ -26,6 +35,16 @@ const App = () => {
   const searchRef = useRef(null);
   const cardsContainerRef = useRef(null);
   const projectCardsRef = useRef([]);
+  const filtersRef = useRef(null);
+
+  // Predefined filter options
+  const collegeOptions = [
+    "Kanti Hospital",
+    "Paropakar Hospital",
+    "Bir Hospital",
+    "Bhaktapur Hospital",
+  ];
+  const departmentOptions = ["BNS", "BSC", "BMS"];
 
   // Fetch data on mount
   useEffect(() => {
@@ -124,9 +143,9 @@ const App = () => {
     }
   }, [filteredProjects, isLoading, initialLoading]);
 
-  // Handle search with debouncing
+  // Handle search and filter with debouncing
   useEffect(() => {
-    const applySearch = () => {
+    const applyFilters = () => {
       setIsLoading(true);
 
       let results = projects;
@@ -141,8 +160,23 @@ const App = () => {
             project.studentsName?.some((student) =>
               student.toLowerCase().includes(term)
             ) ||
-            project.department.toLowerCase().includes(term) ||
-            project.collegeName.toLowerCase().includes(term)
+            project.department?.toLowerCase().includes(term) ||
+            project.collegeName?.toLowerCase().includes(term) ||
+            project.year.includes(term)
+        );
+      }
+
+      // Apply college filter
+      if (filters.college !== "All") {
+        results = results.filter(
+          (project) => project.collegeName === filters.college
+        );
+      }
+
+      // Apply department filter
+      if (filters.department !== "All") {
+        results = results.filter(
+          (project) => project.department === filters.department
         );
       }
 
@@ -153,14 +187,43 @@ const App = () => {
       }, 300);
     };
 
-    const timer = setTimeout(applySearch, 200);
+    const timer = setTimeout(applyFilters, 200);
     return () => clearTimeout(timer);
-  }, [searchTerm, projects]);
+  }, [searchTerm, filters, projects]);
 
   // Clear search
   const clearSearch = () => {
     setSearchTerm("");
   };
+
+  // Handle filter change
+  const handleFilterChange = (filterType, value) => {
+    setFilters((prev) => ({ ...prev, [filterType]: value }));
+  };
+
+  // Clear all filters
+  const clearFilters = () => {
+    setFilters({ college: "All", department: "All" });
+    setSearchTerm("");
+  };
+
+  // Toggle filters panel
+  const toggleFilters = () => {
+    setShowFilters(!showFilters);
+    if (filtersRef.current && !showFilters) {
+      // Only animate when opening
+      gsap.fromTo(
+        filtersRef.current,
+        { height: 0, opacity: 0 },
+        { height: "auto", opacity: 1, duration: 0.4, ease: "power2.inOut" }
+      );
+    }
+  };
+
+  // Active filter count
+  const activeFilterCount = Object.values(filters).filter(
+    (value) => value !== "All"
+  ).length;
 
   // Statistics
   const totalProjects = projects.length;
@@ -244,7 +307,7 @@ const App = () => {
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-6 md:py-8">
-        {/* Search Section */}
+        {/* Search and Filter Section */}
         <div ref={searchRef} className="mb-8">
           {/* Search Bar */}
           <div className="bg-white rounded-xl shadow-lg p-4">
@@ -270,6 +333,139 @@ const App = () => {
               )}
             </div>
           </div>
+
+          {/* Filter Button */}
+          <div className="flex items-center justify-between mt-4">
+            <button
+              onClick={toggleFilters}
+              className="flex items-center gap-2 px-4 py-2 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow"
+            >
+              <Filter size={18} />
+              <span>Filters</span>
+              {activeFilterCount > 0 && (
+                <span className="bg-blue-500 text-white text-xs px-2 py-1 rounded-full min-w-[20px]">
+                  {activeFilterCount}
+                </span>
+              )}
+              <ChevronDown
+                size={16}
+                className={`transition-transform duration-300 ${
+                  showFilters ? "rotate-180" : ""
+                }`}
+              />
+            </button>
+            {activeFilterCount > 0 && (
+              <button
+                onClick={clearFilters}
+                className="text-sm text-gray-600 hover:text-gray-800 flex items-center gap-1"
+              >
+                <X size={14} />
+                Clear all filters
+              </button>
+            )}
+          </div>
+
+          {/* Filter Options Panel */}
+          {showFilters && (
+            <div
+              ref={filtersRef}
+              className="mt-4 bg-white rounded-xl shadow-lg p-6 overflow-hidden"
+            >
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* College Filter */}
+                <div>
+                  <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-3">
+                    <Building size={18} />
+                    College / Hospital
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      onClick={() => handleFilterChange("college", "All")}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                        filters.college === "All"
+                          ? "bg-blue-500 text-white"
+                          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                      }`}
+                    >
+                      All
+                    </button>
+                    {collegeOptions.map((college) => (
+                      <button
+                        key={college}
+                        onClick={() => handleFilterChange("college", college)}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                          filters.college === college
+                            ? "bg-blue-500 text-white"
+                            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                        }`}
+                      >
+                        {college}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Department Filter */}
+                <div>
+                  <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-3">
+                    <GraduationCap size={18} />
+                    Department
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      onClick={() => handleFilterChange("department", "All")}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                        filters.department === "All"
+                          ? "bg-blue-500 text-white"
+                          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                      }`}
+                    >
+                      All
+                    </button>
+                    {departmentOptions.map((dept) => (
+                      <button
+                        key={dept}
+                        onClick={() => handleFilterChange("department", dept)}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                          filters.department === dept
+                            ? "bg-blue-500 text-white"
+                            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                        }`}
+                      >
+                        {dept}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Active Filter Chips */}
+          {activeFilterCount > 0 && (
+            <div className="flex flex-wrap gap-2 mt-4">
+              {filters.college !== "All" && (
+                <span className="inline-flex items-center gap-2 bg-blue-100 text-blue-800 px-3 py-2 rounded-lg text-sm">
+                  <Building size={14} />
+                  {filters.college}
+                  <button onClick={() => handleFilterChange("college", "All")}>
+                    <X size={14} />
+                  </button>
+                </span>
+              )}
+              {filters.department !== "All" && (
+                <span className="inline-flex items-center gap-2 bg-green-100 text-green-800 px-3 py-2 rounded-lg text-sm">
+                  <GraduationCap size={14} />
+                  {filters.department}
+                  <button
+                    onClick={() => handleFilterChange("department", "All")}
+                  >
+                    <X size={14} />
+                  </button>
+                </span>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Results and Loading State */}
@@ -299,10 +495,7 @@ const App = () => {
                   key={project.id}
                   ref={(el) => (projectCardsRef.current[index] = el)}
                   className="group bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 border border-gray-100 cursor-pointer transform hover:-translate-y-1"
-                  onClick={
-                    () => {}
-                    // console.log("Viewing project:", project.researchTitle)
-                  }
+                  onClick={() => {}}
                 >
                   <div className="p-6">
                     <div className="flex justify-between items-start mb-4">
@@ -389,13 +582,14 @@ const App = () => {
                   No matching projects found
                 </h3>
                 <p className="text-gray-600 mb-6">
-                  Try adjusting your search term to find relevant projects.
+                  Try adjusting your search term or filters to find relevant
+                  projects.
                 </p>
                 <button
-                  onClick={clearSearch}
+                  onClick={clearFilters}
                   className="px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg font-medium hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 shadow-md"
                 >
-                  Clear Search
+                  Clear All Filters
                 </button>
               </div>
             </div>
@@ -422,6 +616,12 @@ const App = () => {
                 {totalStudents}
               </div>
               <div className="text-gray-600">Student Researchers</div>
+            </div>
+            <div className="bg-white p-6 rounded-xl shadow-sm text-center">
+              <div className="text-3xl font-bold text-orange-600 mb-2">
+                {totalCitations}
+              </div>
+              <div className="text-gray-600">Total Citations</div>
             </div>
           </div>
         </div>
