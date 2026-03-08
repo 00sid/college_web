@@ -15,7 +15,7 @@ import {
   GraduationCap,
 } from "lucide-react";
 import { getResearchData } from "./firebase/firestore/research_data";
-
+import birLogo from "./assets/bir_logo.png";
 const App = () => {
   // State for fetched projects
   const [projects, setProjects] = useState([]);
@@ -277,7 +277,7 @@ const App = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white">
+      {/* <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white">
         <div className="container mx-auto px-4 py-8 md:py-12">
           <div ref={headerRef} className="max-w-4xl">
             <h1 className="text-3xl md:text-5xl font-bold mb-4">
@@ -303,8 +303,53 @@ const App = () => {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
+      <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white">
+        <div className="container mx-auto px-4 py-8 md:py-12">
+          <div ref={headerRef} className="max-w-4xl">
+            {/* Institution Name */}
+            <div className="mb-3">
+              <span className="text-blue-100 text-sm md:text-base font-medium tracking-wide uppercase">
+                National Academy of Medical Science
+              </span>
+            </div>
 
+            {/* Logo and Title Row */}
+            <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-6 mb-4">
+              <img
+                src={birLogo}
+                alt="BIR Logo"
+                className="h-12 md:h-16 w-auto object-contain"
+              />
+              <div>
+                <h1 className="text-3xl md:text-5xl font-bold">
+                  Nursing Research Repository
+                </h1>
+                <p className="text-lg md:text-xl text-blue-100 mt-2">
+                  Discover and explore research projects from senior nursing
+                  students
+                </p>
+              </div>
+            </div>
+
+            {/* Stats Row */}
+            <div className="flex flex-wrap gap-4">
+              <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-lg">
+                <FileText size={20} />
+                <span>{totalProjects} Projects</span>
+              </div>
+              <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-lg">
+                <Award size={20} />
+                <span>{totalCitations} Citations</span>
+              </div>
+              <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-lg">
+                <TrendingUp size={20} />
+                <span>{uniqueYears} Academic Years</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
       {/* Main Content */}
       <div className="container mx-auto px-4 py-6 md:py-8">
         {/* Search and Filter Section */}
@@ -628,6 +673,17 @@ const App = () => {
       </div>
 
       {/* Footer */}
+      {/* <footer className="mt-12 py-8 bg-gray-900 text-white">
+        <div className="container mx-auto px-4 text-center">
+          <p className="text-gray-400">
+            Nursing College Research Repository © {new Date().getFullYear()}
+          </p>
+          <p className="text-gray-500 text-sm mt-2">
+            For academic and research purposes only
+          </p>
+        </div>
+      </footer> */}
+      {/* Footer */}
       <footer className="mt-12 py-8 bg-gray-900 text-white">
         <div className="container mx-auto px-4 text-center">
           <p className="text-gray-400">
@@ -635,6 +691,15 @@ const App = () => {
           </p>
           <p className="text-gray-500 text-sm mt-2">
             For academic and research purposes only
+          </p>
+          <p className="text-gray-600 text-xs mt-4">
+            Developed by{" "}
+            <a
+              href="mailto:developer.00sid@gmail.com"
+              className="text-gray-400 hover:text-gray-300 underline"
+            >
+              Er. Siddhartha Basnet
+            </a>
           </p>
         </div>
       </footer>
