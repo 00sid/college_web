@@ -698,7 +698,7 @@ const App = () => {
               href="mailto:developer.00sid@gmail.com"
               className="text-gray-400 hover:text-gray-300 underline"
             >
-              Er. Siddhartha Basnet
+              Siddhartha Basnet
             </a>
           </p>
         </div>
