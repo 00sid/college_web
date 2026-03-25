@@ -3,7 +3,7 @@ import { db } from "../index";
 
 export const getResearchData = async () => {
   try {
-    console.log("Fetching Research Data:");
+    // console.log("Fetching Research Data:");
 
     const menuRef = collection(db, "Research Data");
 
